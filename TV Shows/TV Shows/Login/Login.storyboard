@@ -26,7 +26,7 @@
                                     <color key="titleColor" systemColor="labelColor"/>
                                 </state>
                                 <connections>
-                                    <action selector="tappedButton:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="kBv-rO-7AX"/>
+                                    <action selector="tappedButton" destination="Y6W-OH-hqX" eventType="touchUpInside" id="y6W-Sw-5B0"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Tap counter" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zUB-qx-aXm">
@@ -40,8 +40,8 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
-                        <outlet property="button" destination="UXc-ep-VQQ" id="rjR-La-Hmz"/>
-                        <outlet property="counterLabel" destination="zUB-qx-aXm" id="Hee-il-qcQ"/>
+                        <outlet property="incrementButton" destination="UXc-ep-VQQ" id="rjR-La-Hmz"/>
+                        <outlet property="titleLabel" destination="zUB-qx-aXm" id="Hee-il-qcQ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
