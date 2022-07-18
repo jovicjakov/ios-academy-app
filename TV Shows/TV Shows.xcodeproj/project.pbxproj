@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7782275C2884B20A00B76186 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7782275B2884B20A00B76186 /* CustomTextField.swift */; };
 		77B9636C287DAA0D00329C41 /* Login.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77B9636B287DAA0D00329C41 /* Login.storyboard */; };
 		77B9636E287DAA3900329C41 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77B9636D287DAA3900329C41 /* LoginViewController.swift */; };
 		77C700DB28771153006C2F52 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77C700DA28771153006C2F52 /* AppDelegate.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7782275B2884B20A00B76186 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		77B9636B287DAA0D00329C41 /* Login.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Login.storyboard; sourceTree = "<group>"; };
 		77B9636D287DAA3900329C41 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		77C700D728771153006C2F52 /* TV Shows.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TV Shows.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,6 +74,7 @@
 				77C700DC28771153006C2F52 /* SceneDelegate.swift */,
 				77C700DE28771153006C2F52 /* ViewController.swift */,
 				77C700E328771155006C2F52 /* Assets.xcassets */,
+				7782275B2884B20A00B76186 /* CustomTextField.swift */,
 				77C700E528771155006C2F52 /* LaunchScreen.storyboard */,
 				77C700E828771155006C2F52 /* Info.plist */,
 			);
@@ -153,6 +156,7 @@
 				77C700DF28771153006C2F52 /* ViewController.swift in Sources */,
 				77C700DB28771153006C2F52 /* AppDelegate.swift in Sources */,
 				77C700DD28771153006C2F52 /* SceneDelegate.swift in Sources */,
+				7782275C2884B20A00B76186 /* CustomTextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +301,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TV Shows/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = Login;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Login;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -326,7 +330,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TV Shows/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = Login;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Login;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
