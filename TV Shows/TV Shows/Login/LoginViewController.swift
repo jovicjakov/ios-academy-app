@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import MBProgressHUD
+import Alamofire
 
 final class LoginViewController: UIViewController {
     
@@ -23,6 +25,7 @@ final class LoginViewController: UIViewController {
     
     private var checkboxPressed = false
     private var showbtnPressed = false
+    private var userRes : UserResponse?
     
     // MARK: - Lifecycle methods
     
@@ -33,7 +36,7 @@ final class LoginViewController: UIViewController {
     }
     
     // MARK: - Actions
-
+    
     @IBAction func checkboxButtonTapped() {
         checkRememberMe()
     }
@@ -45,7 +48,29 @@ final class LoginViewController: UIViewController {
     @IBAction func emailChanged() {
         enableLogin()
     }
+    
+    @IBAction func loginButtonTapped() {
+        if (!emailTextField.text!.isEmpty && !passwordTextField.text!.isEmpty) {
+            loginUserWith(email: emailTextField.text!, password: passwordTextField.text!)
+            pushHomeViewController()
+        }
+        
+    }
+    
+    @IBAction func registerButtonTapped() {
+        if (!emailTextField.text!.isEmpty && !passwordTextField.text!.isEmpty) {
+            registerUserWith(email: emailTextField.text!, password: passwordTextField.text!)
+            pushHomeViewController()
+        }
+    }
+    
     // MARK: - Utility methods
+    
+    @objc private func pushHomeViewController() {
+        let storyboard = UIStoryboard(name: "Login", bundle: nil)
+        let destinationVC = storyboard.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+        navigationController?.pushViewController(destinationVC, animated: true)
+    }
     
     private func disableLogin() {
         
@@ -62,15 +87,15 @@ final class LoginViewController: UIViewController {
         
         continueLabel.isHidden = true
         showButton.isHidden = true
-    
+        
     }
     
     private func enableLogin() {
-            loginButton.isEnabled = true
-            registerButton.isEnabled = true
-            checkboxButton.isEnabled = true
-            continueLabel.isHidden = false
-            showButton.isHidden = false
+        loginButton.isEnabled = true
+        registerButton.isEnabled = true
+        checkboxButton.isEnabled = true
+        continueLabel.isHidden = false
+        showButton.isHidden = false
     }
     
     private func setupUI() {
@@ -128,21 +153,89 @@ final class LoginViewController: UIViewController {
         }
         showbtnPressed = !showbtnPressed
     }
+}
+
+
+// MARK: - Register + automatic JSON parsing
+
+private extension LoginViewController {
     
-    private func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+    func registerUserWith(email: String, password: String) {
+        MBProgressHUD.showAdded(to: view, animated: true)
         
-        let text = (textField.text! as NSString).replacingCharacters(in: range, with: string)
+        let parameters: [String: String] = [
+            "email": email,
+            "password": password,
+            "password_confirmation": password
+        ]
         
-        if !text.isEmpty{
-            loginButton.isUserInteractionEnabled = true
-            registerButton.isUserInteractionEnabled = true
-        } else {
-            loginButton.isUserInteractionEnabled = false
-            registerButton.isUserInteractionEnabled = false
-        }
-        return true
+        AF
+            .request(
+                "https://tv-shows.infinum.academy/users",
+                method: .post,
+                parameters: parameters,
+                encoder: JSONParameterEncoder.default
+            )
+            .validate()
+            .responseDecodable(of: UserResponse.self) { [weak self] dataResponse in
+                guard let self = self else { return }
+                MBProgressHUD.hide(for: self.view, animated: true)
+                switch dataResponse.result {
+                case .success(let userResponse):
+                    self.userRes = userResponse
+                    print("API/Serialization success: \(userResponse)")
+                case .failure(let error):
+                    print("API/Serialization failure: \(error)")
+                }
+            }
     }
     
 }
+
+
+
+// MARK: - Login + automatic JSON parsing
+
+private extension LoginViewController {
+    
+    func loginUserWith(email: String, password: String) {
+        MBProgressHUD.showAdded(to: view, animated: true)
+        
+        let parameters: [String: String] = [
+            "email": email,
+            "password": password
+        ]
+        
+        AF
+            .request(
+                "https://tv-shows.infinum.academy/users/sign_in",
+                method: .post,
+                parameters: parameters,
+                encoder: JSONParameterEncoder.default
+            )
+            .validate()
+            .responseDecodable(of: UserResponse.self) { [weak self] dataResponse in
+                guard let self = self else { return }
+                MBProgressHUD.hide(for: self.view, animated: true)
+                switch dataResponse.result {
+                case .success(let userResponse):
+                    self.userRes = userResponse
+                    let headers = dataResponse.response?.headers.dictionary ?? [:]
+                    self.handleSuccesfulLogin(for: userResponse.user, headers: headers)
+                case .failure(let error):
+                    print("API/Serialization failure: \(error)")                }
+            }
+    }
+    
+    // Headers will be used for subsequent authorization on next requests
+    func handleSuccesfulLogin(for user: User, headers: [String: String]) {
+        guard let authInfo = try? AuthInfo(headers: headers) else {
+            print("Missing headers")
+            return
+        }
+        print("\(user)\n\n\(authInfo)")
+    }
+}
+
 
 
