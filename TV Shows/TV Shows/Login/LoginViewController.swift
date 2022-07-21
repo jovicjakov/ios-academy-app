@@ -17,14 +17,12 @@ final class LoginViewController: UIViewController {
     @IBOutlet private weak var passwordTextField: UITextField!
     @IBOutlet private weak var loginButton: UIButton!
     @IBOutlet private weak var registerButton: UIButton!
-    @IBOutlet private weak var checkboxButton: UIButton!
-    @IBOutlet private weak var showButton: UIButton!
+    @IBOutlet private weak var rememberMeButton: UIButton!
+    @IBOutlet private weak var showPasswordButton: UIButton!
     @IBOutlet private weak var continueLabel: UILabel!
     
     // MARK: - Properties
     
-    private var checkboxPressed = false
-    private var showbtnPressed = false
     private var userRes : UserResponse?
     
     // MARK: - Lifecycle methods
@@ -38,11 +36,13 @@ final class LoginViewController: UIViewController {
     // MARK: - Actions
     
     @IBAction func checkboxButtonTapped() {
-        checkRememberMe()
+        rememberMeButton.isSelected.toggle()
+        checkRememberMeButton()
     }
     
     @IBAction func showButtonTapped() {
-        checkShow()
+        showPasswordButton.isSelected.toggle()
+        checkShowPasswordButton()
     }
     
     @IBAction func emailChanged() {
@@ -50,18 +50,27 @@ final class LoginViewController: UIViewController {
     }
     
     @IBAction func loginButtonTapped() {
-        if (!emailTextField.text!.isEmpty && !passwordTextField.text!.isEmpty) {
-            loginUserWith(email: emailTextField.text!, password: passwordTextField.text!)
-            pushHomeViewController()
+        guard
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            !email.isEmpty,
+            !password.isEmpty
+        else {
+            return
         }
-        
+        loginUserWith(email: email, password: password)
     }
     
     @IBAction func registerButtonTapped() {
-        if (!emailTextField.text!.isEmpty && !passwordTextField.text!.isEmpty) {
-            registerUserWith(email: emailTextField.text!, password: passwordTextField.text!)
-            pushHomeViewController()
+        guard
+            let email = emailTextField.text,
+            let password = passwordTextField.text,
+            !email.isEmpty,
+            !password.isEmpty
+        else {
+            return
         }
+        registerUserWith(email: email, password: password)
     }
     
     // MARK: - Utility methods
@@ -73,37 +82,30 @@ final class LoginViewController: UIViewController {
     }
     
     private func disableLogin() {
-        
-        checkboxButton.isEnabled = false
-        if let image = UIImage(named: "ic-checkbox-unselected") {
-            checkboxButton.setImage(image, for: .disabled)
-        }
-        
+        rememberMeButton.isEnabled = false
+        rememberMeButton.setImage(UIImage(named: "ic-checkbox-unselected"), for: .disabled)
         loginButton.isEnabled = false
-        loginButton.setTitleColor(UIColor.gray, for: .disabled)
-        
+        loginButton.setTitleColor(.gray, for: .disabled)
         registerButton.isEnabled = false
-        registerButton.setTitleColor(UIColor.gray, for: .disabled)
-        
+        registerButton.setTitleColor(.gray, for: .disabled)
         continueLabel.isHidden = true
-        showButton.isHidden = true
-        
+        showPasswordButton.isHidden = true
     }
     
     private func enableLogin() {
         loginButton.isEnabled = true
         registerButton.isEnabled = true
-        checkboxButton.isEnabled = true
+        rememberMeButton.isEnabled = true
         continueLabel.isHidden = false
-        showButton.isHidden = false
+        showPasswordButton.isHidden = false
     }
     
     private func setupUI() {
         loginButton.layer.cornerRadius = 25
         loginButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         registerButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        underlineTextField(textField:emailTextField)
-        underlineTextField(textField:passwordTextField)
+        
+        viewDidLayoutSubviews()
         
         emailTextField.attributedPlaceholder = NSAttributedString(
             string: "  Email",
@@ -115,48 +117,48 @@ final class LoginViewController: UIViewController {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightText]
         )
         
-        checkRememberMe()
-        checkShow()
+        checkRememberMeButton()
+        checkShowPasswordButton()
     }
     
-    private func underlineTextField(textField:UITextField) {
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        underlineTextField(textField: emailTextField)
+        underlineTextField(textField: passwordTextField)
+    }
+    
+    private func underlineTextField(textField: UITextField) {
         let bottomLayer = CALayer()
-        bottomLayer.frame = CGRect(x: -5, y:textField.frame.height, width: textField.frame.width - 35, height: 1)
+        bottomLayer.frame = CGRect(
+            x: -5,
+            y: textField.frame.height,
+            width: textField.frame.width - 35,
+            height: 1
+        )
         bottomLayer.backgroundColor = UIColor.white.cgColor
         textField.layer.addSublayer(bottomLayer)
     }
     
-    private func checkRememberMe() {
-        if !checkboxPressed {
-            if let image = UIImage(named: "ic-checkbox-selected") {
-                checkboxButton.setImage(image, for: .normal)
-            }
+    private func checkRememberMeButton() {
+        if rememberMeButton.isSelected {
+            rememberMeButton.setImage(UIImage(named: "ic-checkbox-selected"), for: .selected)
         } else {
-            if let image = UIImage(named: "ic-checkbox-unselected") {
-                checkboxButton.setImage(image, for: .normal)
-            }
+            rememberMeButton.setImage(UIImage(named: "ic-checkbox-unselected"), for: .normal)
         }
-        checkboxPressed = !checkboxPressed
     }
     
-    private func checkShow() {
-        if !showbtnPressed {
-            if let image = UIImage(named: "ic-visible") {
-                showButton.setImage(image, for: .normal)
-            }
-            passwordTextField.isSecureTextEntry = true
-        } else {
-            if let image = UIImage(named: "ic-invisible") {
-                showButton.setImage(image, for: .normal)
-            }
+    private func checkShowPasswordButton() {
+        if showPasswordButton.isSelected {
+            showPasswordButton.setImage(UIImage(named: "ic-invisible"), for: .selected)
             passwordTextField.isSecureTextEntry = false
+        } else {
+            showPasswordButton.setImage(UIImage(named: "ic-visible"), for: .normal)
+            passwordTextField.isSecureTextEntry = true
         }
-        showbtnPressed = !showbtnPressed
     }
 }
 
-
-// MARK: - Register + automatic JSON parsing
+    // MARK: - Register + automatic JSON parsing
 
 private extension LoginViewController {
     
@@ -184,17 +186,15 @@ private extension LoginViewController {
                 case .success(let userResponse):
                     self.userRes = userResponse
                     print("API/Serialization success: \(userResponse)")
+                    self.pushHomeViewController()
                 case .failure(let error):
                     print("API/Serialization failure: \(error)")
                 }
             }
     }
-    
 }
 
-
-
-// MARK: - Login + automatic JSON parsing
+    // MARK: - Login + automatic JSON parsing
 
 private extension LoginViewController {
     
@@ -222,6 +222,7 @@ private extension LoginViewController {
                     self.userRes = userResponse
                     let headers = dataResponse.response?.headers.dictionary ?? [:]
                     self.handleSuccesfulLogin(for: userResponse.user, headers: headers)
+                    self.pushHomeViewController()
                 case .failure(let error):
                     print("API/Serialization failure: \(error)")                }
             }
@@ -236,6 +237,3 @@ private extension LoginViewController {
         print("\(user)\n\n\(authInfo)")
     }
 }
-
-
-
