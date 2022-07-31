@@ -8,6 +8,7 @@
 import UIKit
 import MBProgressHUD
 import Alamofire
+import Keychain
 
 final class LoginViewController: UIViewController {
     
@@ -160,12 +161,19 @@ final class LoginViewController: UIViewController {
             passwordTextField.isSecureTextEntry = true
         }
     }
-
+    
     private func loginOrRegisterFailed() {
         let alert = UIAlertController(title: "Login Failed", message: "The operation couldn't be completed.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title:NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in NSLog("The \"OK\" alert occured.")
         }))
         self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func saveToUserDefaults(authInfo: AuthInfo) {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(authInfo) {
+            UserDefaults.standard.set(encoded, forKey: "SavedAuthInfo")
+        }
     }
 }
 
@@ -237,7 +245,8 @@ private extension LoginViewController {
                     self.pushHomeViewController()
                 case .failure(let error):
                     print("API/Serialization failure: \(error)")
-                    self.loginOrRegisterFailed()
+                    self.passwordTextField.shake()
+                    //self.loginOrRegisterFailed()
                 }
             }
     }
@@ -249,6 +258,24 @@ private extension LoginViewController {
             return
         }
         self.authInfo = authInfo
+        if (self.rememberMeButton.isSelected) {
+            self.saveToUserDefaults(authInfo: authInfo)
+            print("\n\n\nREMEMBER ME IS SELECTED TRIED TO SAVE TO USER DEFAULTS\(authInfo)")
+        }
         print("\(user)\n\n\(authInfo)")
+    }
+}
+
+// MARK: - Private extensions
+
+private extension UITextField {
+    func shake() {
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.05
+        animation.repeatCount = 5
+        animation.autoreverses = true
+        animation.fromValue = CGPoint(x: self.center.x - 4.0, y: self.center.y)
+        animation.toValue = CGPoint(x: self.center.x + 4.0, y: self.center.y)
+        layer.add(animation, forKey: "position")
     }
 }
