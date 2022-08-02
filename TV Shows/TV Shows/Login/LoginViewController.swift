@@ -8,7 +8,6 @@
 import UIKit
 import MBProgressHUD
 import Alamofire
-import Keychain
 
 final class LoginViewController: UIViewController {
     
@@ -260,7 +259,6 @@ private extension LoginViewController {
         self.authInfo = authInfo
         if (self.rememberMeButton.isSelected) {
             self.saveToUserDefaults(authInfo: authInfo)
-            print("\n\n\nREMEMBER ME IS SELECTED TRIED TO SAVE TO USER DEFAULTS\(authInfo)")
         }
         print("\(user)\n\n\(authInfo)")
     }

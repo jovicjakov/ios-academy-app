@@ -53,7 +53,7 @@ final class ShowDetailsViewController: UIViewController {
         let navigationController = UINavigationController(rootViewController: writeReviewController)
         writeReviewController.authInfo = authInfo
         writeReviewController.review = reviewsResponse
-        writeReviewController.show_id = Double(show.id)
+        writeReviewController.showID = Double(show.id)
         present(navigationController, animated: true)
     }
     
@@ -85,7 +85,7 @@ extension ShowDetailsViewController: UITableViewDelegate, UITableViewDataSource 
             cell1.isUserInteractionEnabled = false
             if (show.no_of_reviews > 0 && show.average_rating != nil) {
                 cell1.numberOfReviewsLabel.text = String("\(Int(show.no_of_reviews)) REVIEWS, \(Double(show.average_rating!)) AVERAGE")
-                //                cell1.configure(with: show)
+                cell1.configure(with: show)
                 
                 cell1.showImage.kf.setImage(
                     with: URL(string: show.image_url),
@@ -101,6 +101,8 @@ extension ShowDetailsViewController: UITableViewDelegate, UITableViewDataSource 
             cell2.selectionStyle = .none
             cell2.userEmailLabel.text = reviewsResponse.reviews[indexPath.row].user.email
             cell2.userReviewText.text = reviewsResponse.reviews[indexPath.row].comment
+            let currentUserShowRating = reviewsResponse.reviews[indexPath.row].rating
+            cell2.configure(with: currentUserShowRating)
             cell2.userImage.layer.masksToBounds = false
             cell2.userImage.layer.cornerRadius = cell2.userImage.frame.height/2
             cell2.userImage.clipsToBounds = true

@@ -20,7 +20,6 @@ final class Cell2TableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
         ratingView.configure(withStyle: .small)
         ratingView.isEnabled = false
     }
@@ -31,12 +30,11 @@ final class Cell2TableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        userImage.frame = CGRect(x: 16,y: 0,width: 50,height: 50)
     }
         
     // MARK: - Utility methods
-    private func configure(with show: Show) {
-        //ratingView.setRoundedRating(show.average_rating)
+    public func configure(with rating: Double) {
+        ratingView.setRoundedRating(rating)
     }
 
 }

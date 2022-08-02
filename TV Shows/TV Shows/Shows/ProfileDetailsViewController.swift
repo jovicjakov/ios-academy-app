@@ -22,20 +22,15 @@ class ProfileDetailsViewController: UIViewController, UIImagePickerControllerDel
     
     // MARK: - Properties
     
-    private var recievedAuthInfo: AuthInfo!
+    public var recievedAuthInfo: AuthInfo!
     private var recievedUserData: UserResponse!
     private var imagePicker = UIImagePickerController()
+    private var newUserData: UserResponse!
     
     // MARK: - Lifecycle methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let decodedData = UserDefaults.standard.object(forKey: "SavedAuthInfo") as? Data {
-            if let authInfoData = try? JSONDecoder().decode(AuthInfo.self, from: decodedData) {
-                self.recievedAuthInfo = authInfoData
-            }
-        }
         getUserData()
         setupUI()
     }
@@ -46,8 +41,8 @@ class ProfileDetailsViewController: UIViewController, UIImagePickerControllerDel
         if let pickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             userPhotoImageView.contentMode = .scaleAspectFit
             userPhotoImageView.image = pickedImage
+            storeImage(pickedImage)
         }
-        storeImage(userPhotoImageView.image!)
         dismiss(animated: true, completion: nil)
     }
     
@@ -60,6 +55,7 @@ class ProfileDetailsViewController: UIViewController, UIImagePickerControllerDel
         imagePicker.modalPresentationStyle = UIModalPresentationStyle.currentContext
         imagePicker.delegate = self
         present(imagePicker, animated: true)
+        storeImage(userPhotoImageView.image!)
     }
     
     @IBAction func logoutButtonClicked() {
@@ -109,11 +105,26 @@ class ProfileDetailsViewController: UIViewController, UIImagePickerControllerDel
         AF
             .upload(
                 multipartFormData: requestData,
-                to: "https://tv-shows.infinum.academy/users", method: .put
+                to: "https://tv-shows.infinum.academy/users",
+                method: .put,
+                headers: HTTPHeaders(recievedAuthInfo.headers)
             )
             .validate()
-            .responseDecodable(of: UserResponse.self) { dataResponse in
-                print(dataResponse)
+            .responseDecodable(of: UserResponse.self) { [weak self] dataResponse in
+                guard let self = self else { return }
+                MBProgressHUD.hide(for: self.view, animated: true)
+                switch dataResponse.result {
+                case .success(let userResponse):
+                    self.newUserData = userResponse
+                    self.userPhotoImageView.kf.setImage(
+                        with: URL(string: userResponse.user.imageUrl ?? "no url"),
+                        placeholder: UIImage(named: "ic-profile-placeholder")
+                    )
+                    print("API/Serialization success: \(userResponse)")
+                case .failure(let error):
+                    print("API/Serialization failure: \(error)")
+                }
+                
             }
     }
 }
@@ -149,6 +160,3 @@ private extension ProfileDetailsViewController {
         }
     }
 }
-
-
-

@@ -54,6 +54,7 @@ class Shows: UIViewController {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
         let profileDetailsViewController = storyboard.instantiateViewController(withIdentifier: "ProfileDetailsViewController") as! ProfileDetailsViewController
         let navigationController = UINavigationController(rootViewController: profileDetailsViewController)
+        profileDetailsViewController.recievedAuthInfo = recievedAuthInfo
         present(navigationController, animated: true)
     }
 }

@@ -11,19 +11,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     var authInfo: AuthInfo?
-    
+
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let _ = (scene as? UIWindowScene) else { return }
         // Create navigation controller in which we will embed our starting view controller
         let navigationController = UINavigationController()
-        // let authInfo: AuthInfo? =  UserDefaults.standard.object(forKey: "SavedAuthInfo") as? AuthInfo
+        let storyboard = UIStoryboard(name: "Login", bundle: nil)
         if let decodedData = UserDefaults.standard.object(forKey: "SavedAuthInfo") as? Data {
             if let authInfoData = try? JSONDecoder().decode(AuthInfo.self, from: decodedData) {
                 self.authInfo = authInfoData
             }
         }
-        let storyboard = UIStoryboard(name: "Login", bundle: nil)
-        // Check if user picked remember me
         if authInfo != nil {
             let homeViewController = storyboard.instantiateViewController(withIdentifier: "Shows") as! Shows
             navigationController.viewControllers = [homeViewController]

@@ -19,8 +19,7 @@ final class WriteReviewViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var rating: Double!
-    public var show_id: Double!
+    public var showID: Double!
     public var review: ReviewsResponse!
     public var authInfo: AuthInfo!
     
@@ -38,14 +37,8 @@ final class WriteReviewViewController: UIViewController {
     // MARK: - Actions
     
     @IBAction func submitReviewButtonTouched() {
-        guard
-            let comment = enterCommentTextField.text,
-            !comment.isEmpty
-        else {
-            submitReviewFailed()
-            return
-        }
-        submitReviewWith(comment: comment)
+        let comment = enterCommentTextField.text
+        submitReviewWith(comment: comment!)
     }
     
     @IBAction func writingBegan() {
@@ -65,7 +58,7 @@ final class WriteReviewViewController: UIViewController {
         navigationItem.leftBarButtonItem = closeViewItem
         
         ratingView.configure(withStyle: .large)
-        ratingView.isEnabled = false
+        ratingView.isEnabled = true
         
         submitReviewButton.isEnabled = false
         enterCommentTextField.attributedPlaceholder = NSAttributedString(
@@ -100,7 +93,7 @@ private extension WriteReviewViewController {
             let show_id: Double
         }
         
-        let parameters = reviewData(rating: 2, comment: comment, show_id: show_id)
+        let parameters = reviewData(rating: ratingView.rating, comment: comment, show_id: showID)
         
         AF
             .request(

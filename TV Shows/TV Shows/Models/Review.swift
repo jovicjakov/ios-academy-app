@@ -13,18 +13,16 @@ struct ReviewsResponse: Decodable {
 
 struct Review: Decodable {
     let id: String
-    let comment: String
+    let comment: String?
     let rating: Double
-    let show_id: Double
+    let showID: Double
     let user: User
     
     enum CodingKeys: String, CodingKey {
         case id = "id"
         case comment = "comment"
         case rating = "rating"
-        case show_id = "show_id"
+        case showID = "show_id"
         case user = "user"
     }
 }
-
-

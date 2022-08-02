@@ -10,14 +10,14 @@ protocol RatingViewDelegate: AnyObject {
 }
 
 class RatingView: UIView {
-
+    
     enum Style {
         case large
         case small
     }
-
+    
     // MARK: - Public properties
-
+    
     // Sets the rating - value from 0 to 5, inclusive
     // it will get clamped if out of bounds
     var rating: Int!
@@ -25,21 +25,21 @@ class RatingView: UIView {
         get { currentSelectedRating() }
         set { setRating(newValue) }
     }
-
+    
     // Should user be able to change the rating - useful if you
     // want to disable changing rating like on the list of reviews
     var isEnabled: Bool {
         get { isUserInteractionEnabled }
         set { isUserInteractionEnabled = newValue }
     }
-
+    
     // Useful when you want to notify that rating has been selected/changed
     // for example, on new rating screen you should disable Submit button
     // until user selects rating for the first time
     weak var delegate: RatingViewDelegate?
-
+    
     // MARK: - Private properties
-
+    
     private let stackView = UIStackView()
     private let ratingButtons = [
         RatingView.createRatingButton(),
@@ -48,21 +48,21 @@ class RatingView: UIView {
         RatingView.createRatingButton(),
         RatingView.createRatingButton()
     ]
-
+    
     // MARK: - Lifecycle
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         commonInit()
     }
-
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
     }
-
+    
     // MARK: - Public methods
-
+    
     // Configures size of rating buttons - small ones are
     // used on review list, while large are used on new review screen
     func configure(withStyle style: RatingView.Style) {
@@ -81,7 +81,7 @@ class RatingView: UIView {
             $0.setImage(selectedImage, for: .selected)
         }
     }
-
+    
     func setRoundedRating(_ rating: Double) {
         let rounded = Int(rating.rounded())
         self.rating = rounded
@@ -89,15 +89,15 @@ class RatingView: UIView {
 }
 
 private extension RatingView {
-
+    
     func commonInit() {
         addSubview(stackView)
         ratingButtons.forEach { stackView.addArrangedSubview($0) }
-
+        
         configureStackView()
         configureRatingButtons()
     }
-
+    
     func configureStackView() {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -107,48 +107,49 @@ private extension RatingView {
             stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
-
+    
     func configureRatingButtons() {
         configure(withStyle: .large)
-
+        
         ratingButtons.forEach {
             $0.addTarget(self, action: #selector(ratingButtonActionHandler(_:)), for: .touchUpInside)
         }
     }
-
+    
     static func createRatingButton() -> UIButton {
         let button = UIButton()
         button.adjustsImageWhenHighlighted = false
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }
-
+    
     func setRating(_ rating: Int) {
-        for i in 0...(rating-1) {
-            ratingButtons[i].setImage(UIImage(named: "ic-star-selected-large"), for: .normal)
-        }
-        self.rating = rating
+        ratingButtons
+            .enumerated()
+            .forEach { (index, button) in
+                button.isSelected = index < rating
+            }
     }
-
+    
     func currentSelectedRating() -> Int {
-        if rating > ratingButtons.count { return ratingButtons.count}
-        if rating < 0 { return 0}
-        
-        return rating
-    }
+            let lastSelectedIndex = ratingButtons
+                .lastIndex(where: \.isSelected)
+                .flatMap { $0 + 1 } // 0 -> 1
+            return lastSelectedIndex ?? 0
+        }
 }
 
 // MARK: - Action handlers
 
 private extension RatingView {
-
+    
     @objc
     func ratingButtonActionHandler(_ button: UIButton) {
         guard let buttonIndex = ratingButtons.firstIndex(of: button)
         else {
             return
         }
-        let correctRating = (5-(buttonIndex+1)) + (buttonIndex+1)
+        let correctRating = buttonIndex + 1
         setRating(correctRating)
         delegate?.didChangeRating(rating)
     }

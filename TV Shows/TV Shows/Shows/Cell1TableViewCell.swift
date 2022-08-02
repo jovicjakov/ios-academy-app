@@ -24,6 +24,6 @@ final class Cell1TableViewCell: UITableViewCell {
     }
     
     func configure(with show: Show) {
-//        ratingView.setRoundedRating(show.average_rating!)
+        ratingView.setRoundedRating(show.average_rating!)
     }
 }
