@@ -23,7 +23,8 @@ final class LoginViewController: UIViewController {
     
     // MARK: - Properties
     
-    private var userRes : UserResponse?
+    private var userResponse: UserResponse?
+    private var authInfo: AuthInfo?
     
     // MARK: - Lifecycle methods
     
@@ -77,8 +78,11 @@ final class LoginViewController: UIViewController {
     
     @objc private func pushHomeViewController() {
         let storyboard = UIStoryboard(name: "Login", bundle: nil)
-        let destinationVC = storyboard.instantiateViewController(withIdentifier: "HomeViewController") as! HomeViewController
+        let destinationVC = storyboard.instantiateViewController(withIdentifier: "Shows") as! Shows
+        destinationVC.recievedLoginData = userResponse
+        destinationVC.recievedAuthInfo = authInfo
         navigationController?.pushViewController(destinationVC, animated: true)
+        navigationController?.setViewControllers([destinationVC], animated: true)
     }
     
     private func disableLogin() {
@@ -156,9 +160,23 @@ final class LoginViewController: UIViewController {
             passwordTextField.isSecureTextEntry = true
         }
     }
+    
+    private func loginOrRegisterFailed() {
+        let alert = UIAlertController(title: "Login Failed", message: "The operation couldn't be completed.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title:NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in NSLog("The \"OK\" alert occured.")
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    private func saveToUserDefaults(authInfo: AuthInfo) {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(authInfo) {
+            UserDefaults.standard.set(encoded, forKey: "SavedAuthInfo")
+        }
+    }
 }
 
-    // MARK: - Register + automatic JSON parsing
+// MARK: - Register + automatic JSON parsing
 
 private extension LoginViewController {
     
@@ -184,17 +202,18 @@ private extension LoginViewController {
                 MBProgressHUD.hide(for: self.view, animated: true)
                 switch dataResponse.result {
                 case .success(let userResponse):
-                    self.userRes = userResponse
+                    self.userResponse = userResponse
                     print("API/Serialization success: \(userResponse)")
-                    self.pushHomeViewController()
+                    //self.pushHomeViewController()
                 case .failure(let error):
                     print("API/Serialization failure: \(error)")
+                    self.loginOrRegisterFailed()
                 }
             }
     }
 }
 
-    // MARK: - Login + automatic JSON parsing
+// MARK: - Login + automatic JSON parsing
 
 private extension LoginViewController {
     
@@ -219,12 +238,15 @@ private extension LoginViewController {
                 MBProgressHUD.hide(for: self.view, animated: true)
                 switch dataResponse.result {
                 case .success(let userResponse):
-                    self.userRes = userResponse
+                    self.userResponse = userResponse
                     let headers = dataResponse.response?.headers.dictionary ?? [:]
                     self.handleSuccesfulLogin(for: userResponse.user, headers: headers)
                     self.pushHomeViewController()
                 case .failure(let error):
-                    print("API/Serialization failure: \(error)")                }
+                    print("API/Serialization failure: \(error)")
+                    self.passwordTextField.shake()
+                    //self.loginOrRegisterFailed()
+                }
             }
     }
     
@@ -234,6 +256,24 @@ private extension LoginViewController {
             print("Missing headers")
             return
         }
+        self.authInfo = authInfo
+        if (self.rememberMeButton.isSelected) {
+            self.saveToUserDefaults(authInfo: authInfo)
+        }
         print("\(user)\n\n\(authInfo)")
+    }
+}
+
+// MARK: - Private extensions
+
+private extension UITextField {
+    func shake() {
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.05
+        animation.repeatCount = 5
+        animation.autoreverses = true
+        animation.fromValue = CGPoint(x: self.center.x - 4.0, y: self.center.y)
+        animation.toValue = CGPoint(x: self.center.x + 4.0, y: self.center.y)
+        layer.add(animation, forKey: "position")
     }
 }
