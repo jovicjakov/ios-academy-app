@@ -1,7 +1,5 @@
 # Infinum Academy 2022 - iOS
 
-## iOS development course with a focus on how to program in Swift and use Xcode and Git for app development
-
 - Built a fully functional TV show app, which included features like users rating shows, attaching summaries and interacting through a comment section.
   
 
